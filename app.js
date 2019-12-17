@@ -220,13 +220,21 @@ connection.on("open", function() {
 
   app.post("/zones/:zone/:attribute/up", function(req, res) {
     zones = getZones(zones, queryControllers, req, res);
-    req.body = zones[req.zone][req.attribute] + 1;
+    for (let i = 0; i < zones.length; i++) {
+      if (zones[i].zone == req.zone) {
+        req.body = String(Number(zones[i][req.attribute]) + 1);
+      }
+    }
     return postZones(zones, req, queryControllers, res);
   });
 
   app.post("/zones/:zone/:attribute/down", function(req, res) {
     zones = getZones(zones, queryControllers, req, res);
-    req.body = zones[req.zone][req.attribute] - 1;
+    for (let i = 0; i < zones.length; i++) {
+      if (zones[i].zone == req.zone) {
+        req.body = String(Number(zones[i][req.attribute]) - 1);
+      }
+    }
     return postZones(zones, req, queryControllers, res);
   });
 
