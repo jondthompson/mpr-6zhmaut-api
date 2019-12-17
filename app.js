@@ -3,11 +3,11 @@ var morgan = require("morgan");
 var bodyParser = require("body-parser");
 var async = require("async");
 
-var app = express();
+var app = express(); // invoke express to create our app
 var logFormat =
   "'[:date[iso]] - :remote-addr - :method :url :status :response-time ms - :res[content-length]b'";
-app.use(morgan(logFormat));
-app.use(bodyParser.text({ type: "*/*" }));
+app.use(morgan(logFormat)); // invoke morgan
+app.use(bodyParser.text({ type: "*/*" })); // invoke bodyParser
 
 const ReQuery = /^true$/i.test(process.env.REQUERY);
 const UseCORS = /^true$/i.test(process.env.CORS);
@@ -25,12 +25,15 @@ const parser = connection.pipe(
   new Readline({ delimiter: "\n", encoding: "ascii" })
 );
 
+// on connection open
 connection.on("open", function() {
   var zones = {};
 
   const queryControllers = async () => {
     for (let i = 1; i <= AmpCount; i++) {
-      connection.write("?" + i.toString() + "0\r");
+      connection.write("?" + i.toString() + "0\r").catch(err => {
+        console.log(err);
+      });
       await async
         .until(
           function(callback) {
@@ -154,9 +157,9 @@ connection.on("open", function() {
   // Validate and standarize control attributes
   app.param("attribute", function(req, res, next, attribute) {
     if (typeof attribute !== "string") {
-      res
-        .status(500)
-        .send({ error: attribute + " is not a valid zone control attribute" });
+      res.status(500).send({
+        error: attribute + " is not a valid zone control attribute"
+      });
     }
     switch (attribute.toLowerCase()) {
       case "pa":
@@ -215,79 +218,86 @@ connection.on("open", function() {
     }
   });
 
+  app.post("/zones/:zone/:attribute/up", function(req, res) {
+    zones = getZones(zones, queryControllers, req, res);
+    req.body = zones[req.zone]["vo"] + 1;
+    return postZones(zones, req, queryControllers, res);
+  });
+
+  app.post("/zones/:zone/:attribute/down", function(req, res) {
+    zones = getZones(zones, queryControllers, req, res);
+    req.body = zones[req.zone]["vo"] - 1;
+    return postZones(zones, req, queryControllers, res);
+  });
+
   app.post("/zones/:zone/:attribute", function(req, res) {
-    zones = {};
-    const writeAttribute = async () => {
-      connection.write("<" + req.zone + req.attribute + req.body + "\r");
-      await async
-        .until(
-          function(callback) {
-            callback(
-              null,
-              typeof zones !== "undefined" && Object.keys(zones).length === 1
-            );
-          },
-          function(callback) {
-            setTimeout(callback, 10);
-          }
-        )
-        .catch(err => {
-          console.log(err);
-        });
-    };
-    writeAttribute();
-    queryControllers();
-    async
-      .until(
-        function(callback) {
-          callback(null, typeof zones[req.zone] !== "undefined");
-        },
-        function(callback) {
-          setTimeout(callback, 10);
-        },
-        function(err) {
-          console.log(err);
-          res.json(zones[req.zone]);
-        }
-      )
-      .catch(err => {
-        console.log(err);
-      });
+    return postZones(zones, req, queryControllers, res);
   });
 
   app.get("/zones/:zone/:attribute", function(req, res) {
-    zones = {};
-    queryControllers();
-    async
+    return getZones(zones, queryControllers, req, res);
+  });
+
+  app.listen(process.env.PORT || 8181);
+});
+function postZones(zones, req, queryControllers, res) {
+  zones = {};
+  const writeAttribute = async () => {
+    connection.write("<" + req.zone + req.attribute + req.body + "\r");
+    await async
       .until(
         function(callback) {
-          callback(null, typeof zones[req.zone] !== "undefined");
+          callback(
+            null,
+            typeof zones !== "undefined" && Object.keys(zones).length === 1
+          );
         },
         function(callback) {
           setTimeout(callback, 10);
-        },
-        function() {
-          res.send(zones[req.zone][req.attribute]);
         }
       )
       .catch(err => {
         console.log(err);
       });
-  });
+  };
+  writeAttribute();
+  queryControllers();
+  async
+    .until(
+      function(callback) {
+        callback(null, typeof zones[req.zone] !== "undefined");
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function(err) {
+        console.log(err);
+        res.json(zones[req.zone]);
+      }
+    )
+    .catch(err => {
+      console.log(err);
+    });
+  return zones;
+}
 
-  function decreaseVolume(zone) {
-    let vol = 10; // ping api to get this value
-    vol--;
-    // write vol
-    // set here (maybe passing in zone)
-  }
-
-  function increaseVolume(zone) {
-    let vol = 10; // ping api to get this value
-    vol++;
-    // write vol
-    // set here (maybe passing in zone)
-  }
-
-  app.listen(process.env.PORT || 8181);
-});
+function getZones(zones, queryControllers, req, res) {
+  zones = {};
+  queryControllers();
+  async
+    .until(
+      function(callback) {
+        callback(null, typeof zones[req.zone] !== "undefined");
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function() {
+        res.send(zones[req.zone][req.attribute]);
+      }
+    )
+    .catch(err => {
+      console.log(err);
+    });
+  return zones;
+}

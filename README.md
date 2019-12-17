@@ -22,7 +22,6 @@ Monoprice sells this wacky [6 zone amp](https://www.monoprice.com/product?p_id=1
 
 `CORS = <true|false>` - respond to a CORS request with an `Access-Control-Allow-Origin=*` (defaults to false)
 
-
 ## Running the server
 
     PORT=8181 npm start
@@ -35,15 +34,16 @@ or using more environment variables:
 
 You can update the baud rate of the controller to one of the following rates: 9600, 19200, 38400, 57600, 115200, 230400
 
-By default, at power loss, the device is set to run at 9600 BAUD.  You can adjust it using the `updateBaudRate.js` via npm run-script *(or directly with node)*.
+By default, at power loss, the device is set to run at 9600 BAUD. You can adjust it using the `updateBaudRate.js` via npm run-script _(or directly with node)_.
 
 ```
 OLDBAUDRATE=9600 NEWBAUDRATE=115200 npm run-script baudrate
 ```
 
 Notes:
-+ To reset the baud rate remove power from the controller for 30 seconds - it will reset to 9600 BAUD
-+ Running `npm run-script baudrate` with the incorrect connection baud rate will not cause it to lock so intialization scripting could be created to reset the baudrate before the API enables.
+
+- To reset the baud rate remove power from the controller for 30 seconds - it will reset to 9600 BAUD
+- Running `npm run-script baudrate` with the incorrect connection baud rate will not cause it to lock so intialization scripting could be created to reset the baudrate before the API enables.
 
 ### Environment Variables for updateBaudRate.js
 
@@ -60,84 +60,84 @@ Notes:
 ```js
 [
   {
-    "zone": "11",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "15",
-    "tr": "10",
-    "bs": "10",
-    "bl": "10",
-    "ch": "01",
-    "ls": "00"
+    zone: "11",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "15",
+    tr: "10",
+    bs: "10",
+    bl: "10",
+    ch: "01",
+    ls: "00"
   },
   {
-    "zone": "12",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "15",
-    "tr": "10",
-    "bs": "10",
-    "bl": "10",
-    "ch": "01",
-    "ls": "00"
+    zone: "12",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "15",
+    tr: "10",
+    bs: "10",
+    bl: "10",
+    ch: "01",
+    ls: "00"
   },
   {
-    "zone": "13",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "15",
-    "tr": "10",
-    "bs": "10",
-    "bl": "10",
-    "ch": "01",
-    "ls": "00"
+    zone: "13",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "15",
+    tr: "10",
+    bs: "10",
+    bl: "10",
+    ch: "01",
+    ls: "00"
   },
   {
-    "zone": "14",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "10",
-    "tr": "10",
-    "bs": "12",
-    "bl": "10",
-    "ch": "02",
-    "ls": "00"
+    zone: "14",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "10",
+    tr: "10",
+    bs: "12",
+    bl: "10",
+    ch: "02",
+    ls: "00"
   },
   {
-    "zone": "15",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "20",
-    "tr": "07",
-    "bs": "07",
-    "bl": "10",
-    "ch": "01",
-    "ls": "00"
+    zone: "15",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "20",
+    tr: "07",
+    bs: "07",
+    bl: "10",
+    ch: "01",
+    ls: "00"
   },
   {
-    "zone": "16",
-    "pa": "00",
-    "pr": "01",
-    "mu": "00",
-    "dt": "00",
-    "vo": "21",
-    "tr": "07",
-    "bs": "07",
-    "bl": "10",
-    "ch": "01",
-    "ls": "00"
+    zone: "16",
+    pa: "00",
+    pr: "01",
+    mu: "00",
+    dt: "00",
+    vo: "21",
+    tr: "07",
+    bs: "07",
+    bl: "10",
+    ch: "01",
+    ls: "00"
   }
-]
+];
 ```
 
 ### GET /zones/:zone
@@ -208,6 +208,6 @@ The manual for the [6 zone amp](https://www.monoprice.com/product?p_id=10761) is
 
 ## Contributions
 
-* fork
-* create a feature branch
-* open a Pull Request
+- fork
+- create a feature branch
+- open a Pull Request
