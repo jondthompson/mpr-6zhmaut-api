@@ -238,66 +238,68 @@ connection.on("open", function() {
     return getZones(zones, queryControllers, req, res);
   });
 
-  app.listen(process.env.PORT || 8181);
-});
-function postZones(zones, req, queryControllers, res) {
-  zones = {};
-  const writeAttribute = async () => {
-    connection.write("<" + req.zone + req.attribute + req.body + "\r");
-    await async
+  function postZones(zones, req, queryControllers, res) {
+    zones = {};
+    const writeAttribute = async () => {
+      connection.write("<" + req.zone + req.attribute + req.body + "\r");
+      await async
+        .until(
+          function(callback) {
+            callback(
+              null,
+              typeof zones !== "undefined" && Object.keys(zones).length === 1
+            );
+          },
+          function(callback) {
+            setTimeout(callback, 10);
+          }
+        )
+        .catch(err => {
+          console.log(err);
+        });
+    };
+    writeAttribute();
+    queryControllers();
+    async
       .until(
         function(callback) {
-          callback(
-            null,
-            typeof zones !== "undefined" && Object.keys(zones).length === 1
-          );
+          callback(null, typeof zones[req.zone] !== "undefined");
         },
         function(callback) {
           setTimeout(callback, 10);
+        },
+        function(err) {
+          console.log(err);
+          res.json(zones[req.zone]);
         }
       )
       .catch(err => {
         console.log(err);
       });
-  };
-  writeAttribute();
-  queryControllers();
-  async
-    .until(
-      function(callback) {
-        callback(null, typeof zones[req.zone] !== "undefined");
-      },
-      function(callback) {
-        setTimeout(callback, 10);
-      },
-      function(err) {
-        console.log(err);
-        res.json(zones[req.zone]);
-      }
-    )
-    .catch(err => {
-      console.log(err);
-    });
-  return zones;
-}
+    return zones;
+  }
 
-function getZones(zones, queryControllers, req, res) {
-  zones = {};
-  queryControllers();
-  async
-    .until(
-      function(callback) {
-        callback(null, typeof zones[req.zone] !== "undefined");
-      },
-      function(callback) {
-        setTimeout(callback, 10);
-      },
-      function() {
-        res.send(zones[req.zone][req.attribute]);
-      }
-    )
-    .catch(err => {
-      console.log(err);
-    });
-  return zones;
-}
+  function getZones(zones, queryControllers, req, res) {
+    zones = {};
+    queryControllers();
+    async
+      .until(
+        function(callback) {
+          callback(null, typeof zones[req.zone] !== "undefined");
+        },
+        function(callback) {
+          setTimeout(callback, 10);
+        },
+        function() {
+          res.send(zones[req.zone][req.attribute]);
+        }
+      )
+      .catch(err => {
+        console.log(err);
+      });
+    return zones;
+  }
+
+  // RUN APP ON DEFAULT PORT 8181
+  app.listen(process.env.PORT || 8181);
+});
