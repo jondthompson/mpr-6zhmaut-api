@@ -34,22 +34,17 @@ connection.on("open", function() {
       connection.write("?" + i.toString() + "0\r").catch(err => {
         console.log(err);
       });
-      await async
-        .until(
-          function(callback) {
-            callback(
-              null,
-              typeof zones !== "undefined" &&
-                Object.keys(zones).length === 6 * i
-            );
-          },
-          function(callback) {
-            setTimeout(callback, 10);
-          }
-        )
-        .catch(err => {
-          console.log(err);
-        });
+      await async.until(
+        function(callback) {
+          callback(
+            null,
+            typeof zones !== "undefined" && Object.keys(zones).length === 6 * i
+          );
+        },
+        function(callback) {
+          setTimeout(callback, 10);
+        }
+      );
     }
   };
 
@@ -97,29 +92,25 @@ connection.on("open", function() {
       zones = {};
       queryControllers();
     }
-    async
-      .until(
-        function(callback) {
-          callback(
-            null,
-            typeof zones !== "undefined" &&
-              Object.keys(zones).length === zoneCount
-          );
-        },
-        function(callback) {
-          setTimeout(callback, 10);
-        },
-        function() {
-          var zoneArray = [];
-          for (var o in zones) {
-            zoneArray.push(zones[o]);
-          }
-          res.json(zoneArray);
+    async.until(
+      function(callback) {
+        callback(
+          null,
+          typeof zones !== "undefined" &&
+            Object.keys(zones).length === zoneCount
+        );
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function() {
+        var zoneArray = [];
+        for (var o in zones) {
+          zoneArray.push(zones[o]);
         }
-      )
-      .catch(err => {
-        console.log(err);
-      });
+        res.json(zoneArray);
+      }
+    );
   });
 
   // Only allow query and control of single zones
@@ -137,21 +128,17 @@ connection.on("open", function() {
       zones = {};
       queryControllers();
     }
-    async
-      .until(
-        function(callback) {
-          callback(null, typeof zones[req.zone] !== "undefined");
-        },
-        function(callback) {
-          setTimeout(callback, 10);
-        },
-        function() {
-          res.json(zones[req.zone]);
-        }
-      )
-      .catch(err => {
-        console.log(err);
-      });
+    async.until(
+      function(callback) {
+        callback(null, typeof zones[req.zone] !== "undefined");
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function() {
+        res.json(zones[req.zone]);
+      }
+    );
   });
 
   // Validate and standarize control attributes
@@ -250,61 +237,49 @@ connection.on("open", function() {
     zones = {};
     const writeAttribute = async () => {
       connection.write("<" + req.zone + req.attribute + req.body + "\r");
-      await async
-        .until(
-          function(callback) {
-            callback(
-              null,
-              typeof zones !== "undefined" && Object.keys(zones).length === 1
-            );
-          },
-          function(callback) {
-            setTimeout(callback, 10);
-          }
-        )
-        .catch(err => {
-          console.log(err);
-        });
-    };
-    writeAttribute();
-    queryControllers();
-    async
-      .until(
+      await async.until(
         function(callback) {
-          callback(null, typeof zones[req.zone] !== "undefined");
+          callback(
+            null,
+            typeof zones !== "undefined" && Object.keys(zones).length === 1
+          );
         },
         function(callback) {
           setTimeout(callback, 10);
-        },
-        function(err) {
-          console.log(err);
-          res.json(zones[req.zone]);
         }
-      )
-      .catch(err => {
+      );
+    };
+    writeAttribute();
+    queryControllers();
+    async.until(
+      function(callback) {
+        callback(null, typeof zones[req.zone] !== "undefined");
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function(err) {
         console.log(err);
-      });
+        res.json(zones[req.zone]);
+      }
+    );
     return zones;
   }
 
   function getZones(zones, queryControllers, req, res) {
     zones = {};
     queryControllers();
-    async
-      .until(
-        function(callback) {
-          callback(null, typeof zones[req.zone] !== "undefined");
-        },
-        function(callback) {
-          setTimeout(callback, 10);
-        },
-        function() {
-          res.send(zones[req.zone][req.attribute]);
-        }
-      )
-      .catch(err => {
-        console.log(err);
-      });
+    async.until(
+      function(callback) {
+        callback(null, typeof zones[req.zone] !== "undefined");
+      },
+      function(callback) {
+        setTimeout(callback, 10);
+      },
+      function() {
+        res.send(zones[req.zone][req.attribute]);
+      }
+    );
     return zones;
   }
 
