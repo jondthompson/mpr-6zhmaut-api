@@ -14,7 +14,15 @@ const UseCORS = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
 const BaudRate = parseInt(process.env.BAUDRATE || 9600);
 const SerialPort = require("serialport");
+// const SerialPort = require("@serialport/stream");
+// const MockBinding = require("@serialport/binding-mock");
 const Readline = require("@serialport/parser-readline");
+
+// Create a port and enable the echo and recording.
+// SerialPort.Binding = MockBinding;
+// MockBinding.createPort("/dev/null", { echo: true, record: true });
+// MockBinding.createPort("/dev/ROBOT", { echo: true, record: true });
+// const port = new SerialPort("/dev/ROBOT");
 
 var device = process.env.DEVICE || "/dev/ttyUSB0";
 var connection = new SerialPort(device, {
@@ -84,6 +92,11 @@ connection.on("open", function() {
         ls: zone[11]
       };
     }
+  });
+
+  app.get("/", function(req, res) {
+    console.log("HELLO FROM INDEX");
+    return res.send({ message: "hello" });
   });
 
   app.get("/zones", function(req, res) {
@@ -206,6 +219,7 @@ connection.on("open", function() {
   });
 
   app.post("/zones/:zone/:attribute/up", function(req, res) {
+    console.log("GOING UP");
     zones = getZones(zones, queryControllers, req, res);
     for (let i = 0; i < zones.length; i++) {
       if (zones[i].zone == req.zone) {
@@ -267,6 +281,7 @@ connection.on("open", function() {
   }
 
   function getZones(zones, queryControllers, req, res) {
+    console.log("GET ZONES RUNNING");
     zones = {};
     queryControllers();
     async.until(
@@ -280,9 +295,13 @@ connection.on("open", function() {
         res.send(zones[req.zone][req.attribute]);
       }
     );
+    console.log("FINISHED RUNNING GET ZONES");
+    console.log("These are the zones", zones);
     return zones;
   }
 
   // RUN APP ON DEFAULT PORT 8181
-  app.listen(process.env.PORT || 8181);
+  app.listen(process.env.PORT || 8181, () => {
+    console.log("server running");
+  });
 });
