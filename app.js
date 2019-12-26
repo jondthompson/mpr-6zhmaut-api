@@ -13,12 +13,13 @@ const ReQuery = /^true$/i.test(process.env.REQUERY);
 const UseCORS = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
 const BaudRate = parseInt(process.env.BAUDRATE || 9600);
-const SerialPort = require("serialport");
-// const SerialPort = require("@serialport/stream");
-// const MockBinding = require("@serialport/binding-mock");
+const SerialPort = require("serialport"); // comment out if using mock hardware
+// const SerialPort = require("@serialport/stream"); // uncomment if needing to mock hardware
+// const MockBinding = require("@serialport/binding-mock"); // uncomment if needing to mock hardware
 const Readline = require("@serialport/parser-readline");
 
 // Create a port and enable the echo and recording.
+// NOTE: Uncomment the lines below if needing to mock hardware:
 // SerialPort.Binding = MockBinding;
 // MockBinding.createPort("/dev/null", { echo: true, record: true });
 // MockBinding.createPort("/dev/ROBOT", { echo: true, record: true });
