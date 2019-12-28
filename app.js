@@ -19,8 +19,10 @@ const SerialPort = require("serialport"); // if needing mock hardware, comment t
 const Readline = require("@serialport/parser-readline");
 const attributeIncreaseDecreaseValue = 1; // change this to desired INC/DEC amount for /up and /down routes
 
-// Create a port and enable the echo and recording.
-// NOTE: Uncomment the lines below if needing to mock hardware:
+/* 
+NOTE: Uncomment the lines below if needing to mock hardware:
+See https://serialport.io/docs/guide-testing for more info: 
+*/
 // SerialPort.Binding = MockBinding;
 // MockBinding.createPort("/dev/null", { echo: true, record: true });
 // MockBinding.createPort("/dev/ROBOT", { echo: true, record: true });
