@@ -13,10 +13,11 @@ const ReQuery = /^true$/i.test(process.env.REQUERY);
 const UseCORS = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
 const BaudRate = parseInt(process.env.BAUDRATE || 9600);
-const SerialPort = require("serialport"); // comment out if using mock hardware
-// const SerialPort = require("@serialport/stream"); // uncomment if needing to mock hardware
-// const MockBinding = require("@serialport/binding-mock"); // uncomment if needing to mock hardware
+const SerialPort = require("serialport"); // if needing mock hardware, comment this line out
+// const SerialPort = require("@serialport/stream"); // uncomment this line if needing to mock hardware
+// const MockBinding = require("@serialport/binding-mock"); // uncomment this line if needing to mock hardware
 const Readline = require("@serialport/parser-readline");
+const attributeIncreaseDecreaseValue = 1; // change this to desired INC/DEC amount for /up and /down routes
 
 // Create a port and enable the echo and recording.
 // NOTE: Uncomment the lines below if needing to mock hardware:
@@ -224,7 +225,9 @@ connection.on("open", function() {
     zones = getZones(zones, queryControllers, req, res);
     for (let i = 0; i < zones.length; i++) {
       if (zones[i].zone == req.zone) {
-        req.body = String(Number(zones[i][req.attribute]) + 1);
+        req.body = String(
+          Number(zones[i][req.attribute]) + attributeIncreaseDecreaseValue
+        );
       }
     }
     return postZones(zones, req, queryControllers, res);
@@ -234,7 +237,9 @@ connection.on("open", function() {
     zones = getZones(zones, queryControllers, req, res);
     for (let i = 0; i < zones.length; i++) {
       if (zones[i].zone == req.zone) {
-        req.body = String(Number(zones[i][req.attribute]) - 1);
+        req.body = String(
+          Number(zones[i][req.attribute]) - attributeIncreaseDecreaseValue
+        );
       }
     }
     return postZones(zones, req, queryControllers, res);
